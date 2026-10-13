@@ -11,7 +11,7 @@ pub fn main() !void {
     flac.setAllocator(arena.allocator());
 
     // 512 stereo frames of 16-bit PCM, interleaved: l r l r ...
-    var pcm: [1024]i32 = .{0} ** 1024;
+    var pcm: [1024]i32 = @splat(0);
     var encoded: [4096]u8 = undefined;
 
     var sink = flac.MemorySink{ .buffer = &encoded };
