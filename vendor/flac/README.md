@@ -27,8 +27,12 @@ plus the two `deduplication/*.c` fragments that `bitreader.c` and `lpc.c`
 which `build.zig` compiles only for Windows targets because `compat.h` routes
 libFLAC's file helpers through it.
 
-Headers: the seven public `FLAC/*.h` the bindings `@cImport`, the `share/*.h`
-those pull in, and `src/libFLAC/include/{private,protected}/*.h` as needed.
+Headers: all seven public `FLAC/*.h` — the five the build-time bindings
+include (see `src/flac/flac.h`: `format.h`, `stream_decoder.h`,
+`stream_encoder.h` and the `export.h`/`ordinals.h` they pull in), plus
+`assert.h`/`callback.h`, which the C sources need — along with the
+`share/*.h` those pull in, and `src/libFLAC/include/{private,protected}/*.h`
+as needed.
 
 Left out: Ogg (`*_ogg*`, `ogg_*.h`), the metadata object API
 (`metadata*.c`, `metadata.h`), seektable/cue-sheet/picture support, the

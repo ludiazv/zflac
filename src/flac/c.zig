@@ -2,9 +2,8 @@
 //!
 //! Everything in this package is built on top of this single translation
 //! unit; the rest of the library never names a `FLAC__*` symbol directly.
+//!
+//! The bindings are generated at build time by the translate-c package from
+//! `flac.h` (see build.zig) and imported here as the `flac_c` module.
 
-pub const c = @cImport({
-    @cInclude("FLAC/format.h");
-    @cInclude("FLAC/stream_decoder.h");
-    @cInclude("FLAC/stream_encoder.h");
-});
+pub const c = @import("flac_c");

@@ -28,7 +28,7 @@ const win_sources = [_][]const u8{"src/share/win_utf8_io/win_utf8_io.c"};
 /// Everything that shapes the compiled libFLAC.
 const Config = struct {
     target: std.Build.ResolvedTarget,
-    optimize: std.builtin.OptimizeMode,
+    optimize: std.lang.Optimize,
     assertions: bool,
     alloc_hooks: bool,
     use_system: bool,
@@ -59,7 +59,7 @@ pub fn build(b: *std.Build) void {
         bool,
         "flac-assertions",
         "Keep libFLAC's internal assertions and debug output enabled",
-    ) orelse (optimize == .Debug);
+    ) orelse (optimize == .debug);
 
     // libFLAC calls log() and lround() from the encoder's entropy model.
     // Windows keeps them in the CRT; there is no separate libm to name.
@@ -107,8 +107,27 @@ pub fn build(b: *std.Build) void {
         .link_libc = link_libc orelse hosted,
     };
 
+    // The C bindings are generated once per build by the translate-c
+    // package from src/flac/flac.h and shared by every module (see
+    // src/flac/c.zig).  They track the same target, optimize mode and libc
+    // setting as the library; only the assertion state differs between the
+    // public and the private test module, and the headers do not see it.
+    // When linking a system libFLAC the headers come from that library
+    // instead of the vendored copy, so the bindings cannot skew from it.
+    const translate_c = b.dependency("translate_c", .{});
+    const Translator = @import("translate_c").Translator;
+    const bindings: Translator = .init(translate_c, .{
+        .name = "flac_c",
+        .c_source_file = b.path("src/flac/flac.h"),
+        .target = target,
+        .optimize = optimize,
+        .link_libc = base.link_libc,
+        .link_system_libs = if (base.use_system) &.{.{ .name = "FLAC" }} else &.{},
+    });
+    if (!base.use_system) bindings.addIncludePath(b.path("vendor/flac/include"));
+
     // Exposed to dependents as `b.dependency("zflac", ...).module("zflac")`.
-    const flac = flacModule(b, "zflac", base);
+    const flac = flacModule(b, "zflac", base, bindings.mod);
 
     // `zig build` produces a static library that already contains libFLAC.
     const lib = b.addLibrary(.{ .name = "zflac", .root_module = flac });
@@ -122,7 +141,7 @@ pub fn build(b: *std.Build) void {
     else blk: {
         var cfg = base;
         cfg.assertions = test_assertions;
-        break :blk flacModule(b, null, cfg);
+        break :blk flacModule(b, null, cfg, bindings.mod);
     };
 
     const test_module = makeModule(b, test_flac, "tests/tests.zig", target, optimize);
@@ -162,8 +181,14 @@ pub fn build(b: *std.Build) void {
 
 /// Builds the `zflac` module: the Zig surface plus the compiled libFLAC.
 /// `name` is `null` for a private copy, used when the test step wants a
-/// different assertion setting than the shipped module.
-fn flacModule(b: *std.Build, name: ?[]const u8, cfg: Config) *std.Build.Module {
+/// different assertion setting than the shipped module.  `flac_c` is the
+/// shared translate-c bindings module (see `build`).
+fn flacModule(
+    b: *std.Build,
+    name: ?[]const u8,
+    cfg: Config,
+    flac_c: *std.Build.Module,
+) *std.Build.Module {
     const options = b.addOptions();
     options.addOption(bool, "alloc_hooks", cfg.alloc_hooks);
     options.addOption(bool, "system_library", cfg.use_system);
@@ -176,10 +201,12 @@ fn flacModule(b: *std.Build, name: ?[]const u8, cfg: Config) *std.Build.Module {
     };
     const m = if (name) |n| b.addModule(n, create) else b.createModule(create);
     m.addOptions("config", options);
+    m.addImport("flac_c", flac_c);
 
-    if (cfg.use_system) {
-        m.linkSystemLibrary("FLAC", .{});
-    } else {
+    // With `-Dflac-system` the system libFLAC is already linked: the shared
+    // bindings module links it, and the link propagates through the import
+    // above.  Only the vendored sources need adding here.
+    if (!cfg.use_system) {
         m.addIncludePath(b.path("vendor/flac"));
         m.addIncludePath(b.path("vendor/flac/include"));
         m.addIncludePath(b.path("vendor/flac/src/libFLAC/include"));
@@ -223,7 +250,7 @@ fn makeModule(
     flac: *std.Build.Module,
     comptime file: []const u8,
     target: std.Build.ResolvedTarget,
-    optimize: std.builtin.OptimizeMode,
+    optimize: std.lang.Optimize,
 ) *std.Build.Module {
     return b.createModule(.{
         .root_source_file = b.path(file),

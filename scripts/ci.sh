@@ -67,8 +67,8 @@ step "test (quiet libFLAC)" build -Dtest-flac-assertions=false test
 step "test (no alloc hooks)" build -Dflac-alloc-hooks=false test
 step "test (libFLAC asserts off)" build -Dflac-assertions=false test
 step "test (no fseeko)" build -Dflac-fseeko=false test
-step "test (ReleaseSafe)" build -Doptimize=ReleaseSafe test
-step "test (ReleaseFast)" build -Doptimize=ReleaseFast test
+step "test (ReleaseSafe)" build -Doptimize=safe test
+step "test (ReleaseFast)" build -Doptimize=fast test
 
 step "example" build example
 step "quickstart" build quickstart
@@ -90,12 +90,12 @@ for t in $cross_only; do
     # A separate prefix: installing a cross build into ./zig-out would leave a
     # foreign binary where the host one was, and the next local run of
     # zig-out/bin/convert would fail with a shell syntax error.
-    step "build $t" build -Dtarget=$t -Doptimize=ReleaseSmall --prefix /tmp/zflac-ci-cross
+    step "build $t" build -Dtarget=$t -Doptimize=small --prefix /tmp/zflac-ci-cross
     rm -rf /tmp/zflac-ci-cross
 done
 
 for t in $cross_test; do
-    step "test $t" build -Dtarget=$t -Doptimize=ReleaseSmall test
+    step "test $t" build -Dtarget=$t -Doptimize=small test
 done
 
 step "test musl (no fseeko)" build -Dtarget=x86_64-linux-musl -Dflac-fseeko=false test
