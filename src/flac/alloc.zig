@@ -31,7 +31,7 @@ var allocator: ?std.mem.Allocator = if (builtin.link_libc) std.heap.c_allocator 
 
 /// Blocks libFLAC currently holds.
 ///
-/// Tracked whenever `std.debug.runtime_safety` is set — Debug and ReleaseSafe —
+/// Tracked whenever the build has runtime safety — Debug and ReleaseSafe —
 /// so `setAllocator` can refuse to swap the allocator out from under live
 /// buffers.  The header magic cannot catch that mistake: a block made by the
 /// old allocator carries our magic just like one made by the new one, so the
@@ -44,11 +44,11 @@ var allocator: ?std.mem.Allocator = if (builtin.link_libc) std.heap.c_allocator 
 var live_blocks: std.atomic.Value(usize) = .init(0);
 
 inline fn countAlloc() void {
-    if (std.debug.runtime_safety) _ = live_blocks.fetchAdd(1, .monotonic);
+    if (builtin.mode.runtimeSafety()) _ = live_blocks.fetchAdd(1, .monotonic);
 }
 
 inline fn countFree() void {
-    if (std.debug.runtime_safety) _ = live_blocks.fetchSub(1, .monotonic);
+    if (builtin.mode.runtimeSafety()) _ = live_blocks.fetchSub(1, .monotonic);
 }
 
 /// Sets the allocator used for libFLAC's internal buffers.
@@ -65,7 +65,7 @@ pub fn setAllocator(value: std.mem.Allocator) void {
     if (!config.alloc_hooks) {
         @compileError("zflac was built with -Dflac-alloc-hooks=false; libFLAC uses libc malloc() directly");
     }
-    if (std.debug.runtime_safety) {
+    if (builtin.mode.runtimeSafety()) {
         const held = live_blocks.load(.monotonic);
         if (held != 0) {
             std.debug.panic(

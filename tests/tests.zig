@@ -1,6 +1,7 @@
 //! Round-trip tests: encode synthetic PCM, decode it again, compare.
 
 const std = @import("std");
+const builtin = @import("builtin");
 const flac = @import("zflac");
 
 /// A deterministic, compressible signal so the tests do not depend on libm.
@@ -256,7 +257,7 @@ test "sample counts that do not match the channel count" {
 
 test "deinit gives back every block libFLAC took" {
     if (!flac.build.alloc_hooks) return; // libFLAC is on libc malloc here
-    if (!std.debug.runtime_safety) return; // the counter is compiled out
+    if (!builtin.mode.runtimeSafety()) return; // the counter is compiled out
 
     // `setAllocator` refuses to swap while libFLAC holds anything, which is
     // only sound if every teardown path — including one that ended in an

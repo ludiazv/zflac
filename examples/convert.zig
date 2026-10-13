@@ -416,7 +416,7 @@ fn narrow(dst: []u8, src: []const i32, bits: u8) usize {
             // if the stream carried samples that do not fit in 8 bits.
             8 => dst[i] = @intCast(sample +% 128),
             16 => {
-                // 0.16 will not truncate signed to unsigned, so narrow within
+                // Zig will not truncate signed to unsigned, so narrow within
                 // the signed range first and then reinterpret the bits.
                 const v: i16 = @truncate(sample);
                 std.mem.writeInt(u16, dst[i * 2 ..][0..2], @bitCast(v), .little);
