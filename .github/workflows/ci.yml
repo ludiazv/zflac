@@ -1,0 +1,38 @@
+name: CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # The full matrix: format, every build-option combination, the examples, and
+  # the cross-target builds.  Everything lives in scripts/ci.sh so a local run
+  # and CI ask the same questions.
+  matrix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      # No version input: setup-zig reads minimum_zig_version from build.zig.zon.
+      - uses: mlugg/setup-zig@v2
+      - run: ./scripts/ci.sh
+
+  # A real Windows and macOS toolchain, which the cross builds above only
+  # approximate: Windows exercises the win_utf8_io shims and the CRT's math
+  # functions, macOS exercises the system frameworks libFLAC sees there.
+  native:
+    name: ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, macos-latest]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: mlugg/setup-zig@v2
+      - run: zig build test
+      - run: zig build quickstart

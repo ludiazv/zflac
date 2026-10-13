@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- zflac logomark, one colour (inherits currentColor) - small sizes, print, stencils -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" role="img" aria-label="zflac">
+  <path fill="currentColor" d="M86 110h52v60h-52zM158 110h52v60h-52zM230 110h52v60h-52zM302 110h52v60h-52zM374 110h52v60h-52zM302 170h52l-50 80l-44 12l-50 80h-52l50-80l44-12zM86 342h52v60h-52zM158 342h52v60h-52zM230 342h52v60h-52zM302 342h52v60h-52zM374 342h52v60h-52z"/>
+</svg>

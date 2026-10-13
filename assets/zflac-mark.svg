@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- zflac logomark - a "Z" set in FLAC level-meter bars, on a chamfered plate -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" role="img" aria-label="zflac">
+  <path fill="#0e1116" d="M104 32h304l72 72v304l-72 72H104l-72-72V104z"/>
+  <path fill="#f7a41d" d="M302 170h52l-50 80l-44 12l-50 80h-52l50-80l44-12z"/>
+  <path fill="#e8382c" d="M86 110h52v60h-52zM158 110h52v60h-52zM230 110h52v60h-52zM302 110h52v60h-52zM374 110h52v60h-52z"/>
+  <path fill="#2ea02a" d="M86 342h52v60h-52zM158 342h52v60h-52zM230 342h52v60h-52zM302 342h52v60h-52zM374 342h52v60h-52z"/>
+</svg>

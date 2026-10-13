@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- zflac lockup - transparent, for light backgrounds -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 786 226" width="786" height="226" role="img" aria-label="zflac">
+  <g transform="translate(26 -3.5) scale(1.55)">
+    <g transform="translate(0 40) scale(.3425) translate(-86 -110)">
+      <path fill="#f7a41d" d="M302 170h52l-50 80l-44 12l-50 80h-52l50-80l44-12z"/>
+      <path fill="#e8382c" d="M86 110h52v60h-52zM158 110h52v60h-52zM230 110h52v60h-52zM302 110h52v60h-52zM374 110h52v60h-52z"/>
+      <path fill="#2ea02a" d="M86 342h52v60h-52zM158 342h52v60h-52zM230 342h52v60h-52zM302 342h52v60h-52zM374 342h52v60h-52z"/>
+    </g>
+    <g fill="#0e1116">
+      <path d="M154 10h22v130h-22zM134 40h64v22h-64zM176 10a22 22 0 0 1 22 22h-22z"/>
+      <path d="M216 10h22v130h-22z"/>
+      <path d="M306 40a50 50 0 0 1 0 100 50 50 0 0 1 0-100zM306 62a28 28 0 0 0 0 56 28 28 0 0 0 0-56zM334 40h22v100h-22z"/>
+      <path d="M459.36 54.64a50 50 0 1 0 0 70.72l-15.56-15.56a28 28 0 1 1 0-39.6z"/>
+    </g>
+  </g>
+</svg>
